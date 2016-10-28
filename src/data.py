@@ -13,8 +13,8 @@ def parse_fna(fname='GCF_000091665.1_ASM9166v1_genomic.fna'):
 def parse_gbff(fname='GCF_000091665.1_ASM9166v1_genomic.gbff'):
     f = open(fname, 'r')
     gene_pattern = re.compile("CDS\s+(\d+)\.\.(\d+)")
-    a = f.read().split('ORIGIN')
-    return re.findall(gene_pattern, a[0])
+    gene_1 = f.read().split('ORIGIN')[0]
+    return [(int(seq[0]), int(seq[1])) for seq in re.findall(gene_pattern, gene_1)]
 
 # GCF_000091665.1_ASM9166v1_genomic.fna
 # GCF_000091665.1_ASM9166v1_genomic.gbff
