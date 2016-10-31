@@ -25,12 +25,29 @@ def predict_by_length(seq, lower=LOWER_CUTOFF, upper=UPPER_CUTOFF):
                     orf_start = i+4
     return predictions
 
+def predict_by_threshold(seq, threshold=50):
+    predictions = [[] for j in range(2)]
+    for offset in range(3):
+        orf_start = 1 + offset
+        for i in range(offset, len(seq), 3):
+            if len(seq) - i >= 3: # check to make sure we don't run off the end of the genome
+                codon = re.sub(r'[^AGTC]', 'T', seq[i:i+3].upper())
+                if codon in END_CODONS:
+                    start_pos = orf_start
+                    end_pos = i + 3
+                    if end_pos - start_pos < threshold:
+                        predictions[0].append((start_pos, end_pos))
+                    else:
+                        predictions[1].append((start_pos, end_pos))
+                    orf_start = i+4
+    return predictions
+
 def check_predictions(predictions, actual):
-    p = set([orf[1] for offsets in predictions for ranges in offsets for orf in ranges])
-    a = set([a[1] for a in actual])
-    true_positives = len(p & a)
-    false_positives = len(p - a)
-    false_negatives = len(a - p)
+    # p = set([orf[1] for offsets in predictions for ranges in offsets for orf in ranges])
+    p = set([range[1] for range in predictions])
+    true_positives = len(p & actual)
+    false_positives = len(p - actual)
+    false_negatives = len(actual - p)
     return true_positives, false_positives, false_negatives
 
 def train_markov_counts(sequences, chain_len=3):
@@ -47,7 +64,6 @@ def train_markov_counts(sequences, chain_len=3):
     return counts
 
 def train_markov_model(valid_orfs, invalid_orfs):
-    # mapping: 'ATC' -> {
     P = train_markov_counts(valid_orfs)
     Q = train_markov_counts(invalid_orfs)
 
@@ -68,6 +84,15 @@ def print_markov_table(counts):
     for i, row in enumerate(counts):
         print(map[i] + ' '*4 + '{0:14}{1:14}{2:14}{3:14}'.format(str(row[0]), str(row[1]), str(row[2]), str(row[3])))
 
+def markov_score(P, Q, seq, chain_len=3):
+    mm = 0
+    for j in range(chain_len, len(seq)):
+        markov = seq[j-chain_len:j]
+        nuc = seq[j]
+        pp = log2(P[markov][nuc]) - log2(sum([P[markov][i] for i in P[markov]]))
+        qq = log2(Q[markov][nuc]) - log2(sum([Q[markov][i] for i in Q[markov]]))
+        mm += pp - qq
+    return mm
 
 if __name__ == '__main__':
     raw_data = parse_fna()
@@ -83,7 +108,10 @@ if __name__ == '__main__':
     print('1.c ORF\'s longer than 1400 nucleotides: ' + str(sum([len(orf) for orf in predictions[2]])))
 
     # check predictions made based on length
-    tru_pos, false_pos, false_neg = check_predictions(predictions, genes)
+    all_pred = [r for length in predictions for ranges in length for r in ranges]
+
+    actual = set([g[1] for g in genes])
+    tru_pos, false_pos, false_neg = check_predictions(all_pred, actual)
     print('1.d CDS\'s found in GenBank: ' + str(tru_pos))
 
     # Markov count tables
@@ -112,16 +140,8 @@ if __name__ == '__main__':
         start = lowest_short_orfs[i][0] - 1
         end = lowest_short_orfs[i][1]
         length = end - start
-        mm = 0
         seq = raw_data[start:end]
-        chain_len = 3
-        for j in range(chain_len, len(seq)):
-            markov = seq[j-chain_len:j]
-            nuc = seq[j]
-            pp = log2(P[markov][nuc]) - log2(sum([P[markov][i] for i in P[markov]]))
-            qq = log2(Q[markov][nuc]) - log2(sum([Q[markov][i] for i in Q[markov]]))
-            mm += pp - qq
-
+        mm = markov_score(P, Q, seq)
         print('{0:d}{1:6d}{2:12d}{3:22.11f}      {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
 
     # ORF's higher than 1400
@@ -131,17 +151,7 @@ if __name__ == '__main__':
         start = lowest_long_orfs[i][0] - 1
         end = lowest_long_orfs[i][1]
         length = end - start
-        mm = 0
         seq = raw_data[start:end]
-        chain_len = 3
-        for j in range(chain_len, len(seq)):
-            markov = seq[j-chain_len:j]
-            nuc = seq[j]
-            pp = log2(P[markov][nuc]) - log2(sum([P[markov][i] for i in P[markov]]))
-            qq = log2(Q[markov][nuc]) - log2(sum([Q[markov][i] for i in Q[markov]]))
-            mm += pp - qq
-
-       # print('{0:6d}{1:11d}{2:11d}{3:.18f} {4}'.format(i+1, 1, 1.0, 1, str(mm > 0)))
+        mm = markov_score(P, Q, seq)
         print('{0:d}    {1:6d}{2:10d}{3:21.11f}     {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
 
-    

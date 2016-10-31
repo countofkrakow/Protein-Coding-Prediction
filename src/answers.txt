@@ -1,0 +1,46 @@
+Chris Nakovski
+hw2
+CSE 427
+
+1.a ORF's per reading frame:
+	0: 37897
+	1: 38771
+	2: 38529
+1.b ORF's shorter than 50 nucleotides: 88030
+1.c ORF's longer than 1400 nucleotides: 118
+1.d CDS's found in GenBank: 878
+1.e Markov chain counts
+    P counts:
+    x/y  A             C             G             T
+    A    (6580, 15925) (1780, 4245)  (3965, 8034)  (3336, 9162)
+    C    (1656, 3997)  (685, 1479)   (293, 765)    (773, 3109)
+    G    (3295, 9681)  (999, 2719)   (1981, 4195)  (956, 4043)
+    T    (3395, 8932)  (837, 2550)   (2259, 6184)  (2907, 9109)
+
+    Q counts:
+    x/y  A             C             G             T
+    A    (28571, 73290)(8454, 23175) (13459, 31219)(20644, 55273)
+    C    (7929, 20556) (4319, 10327) (1209, 3489)  (5077, 19626)
+    G    (12136, 36322)(4744, 14482) (7204, 16687) (5306, 20666)
+    T    (26783, 62095)(7386, 23719) (11322, 29521)(20399, 63404)
+1.f
+    SUMMARY FOR FIRST 5 ORFS OF LENGTH < 50
+    #     Start      Length     MM Score           CDS?
+    1     0          39         0.03156742017      True
+    2     2           6         0.36262054431      True
+    3     8          15         0.81785593757      True
+    4    23          12        -0.47279966662      False
+    5    39          15         0.24829420440      True
+    SUMMARY FOR FIRST 5 ORFS OF LENGTH > 1400
+    #     Start      Length     MM Score           CDS?
+    1     17618      1614       29.87548854819     True
+    2     33625      1623       56.15971899082     True
+    3     42724      2388       33.74059470884     True
+    4     74591      1422       44.88174174503     True
+    5     76819      1665       73.57136684835     True
+
+2.
+
+3. ORF length get's a 80% accuracy rate around chain length 350.  At this point, there are 766 TP's and 189 FP's.
+
+4. Markov chain probabilities get 80% accuracy around log probability of 7.2. At this point there are 507 TP's and 113 FP's.
