@@ -104,6 +104,8 @@ if __name__ == '__main__':
     for offset in predictions[2]:
         lowest_long_orfs += offset
     lowest_long_orfs.sort()
+
+    # ORF's lower than 50
     print('SUMMARY FOR FIRST 5 ORFS OF LENGTH < 50')
     print('#     Start      Length     MM Score           CDS?')
     for i in range(5):
@@ -116,10 +118,30 @@ if __name__ == '__main__':
         for j in range(chain_len, len(seq)):
             markov = seq[j-chain_len:j]
             nuc = seq[j]
-            mm += (log2(P[markov][nuc]) - log2(Q[markov][nuc]))
+            pp = log2(P[markov][nuc]) - log2(sum([P[markov][i] for i in P[markov]]))
+            qq = log2(Q[markov][nuc]) - log2(sum([Q[markov][i] for i in Q[markov]]))
+            mm += pp - qq
+
+        print('{0:d}{1:6d}{2:12d}{3:22.11f}      {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
+
+    # ORF's higher than 1400
+    print('SUMMARY FOR FIRST 5 ORFS OF LENGTH > 1400')
+    print('#     Start      Length     MM Score           CDS?')
+    for i in range(5):
+        start = lowest_long_orfs[i][0] - 1
+        end = lowest_long_orfs[i][1]
+        length = end - start
+        mm = 0
+        seq = raw_data[start:end]
+        chain_len = 3
+        for j in range(chain_len, len(seq)):
+            markov = seq[j-chain_len:j]
+            nuc = seq[j]
+            pp = log2(P[markov][nuc]) - log2(sum([P[markov][i] for i in P[markov]]))
+            qq = log2(Q[markov][nuc]) - log2(sum([Q[markov][i] for i in Q[markov]]))
+            mm += pp - qq
 
        # print('{0:6d}{1:11d}{2:11d}{3:.18f} {4}'.format(i+1, 1, 1.0, 1, str(mm > 0)))
-        print('{0:d}{1:6d}{2:12d}{3:.11f} {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
+        print('{0:d}    {1:6d}{2:10d}{3:21.11f}     {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
 
-
-    print(check_predictions(predictions, genes))
+    
