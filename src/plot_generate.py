@@ -9,11 +9,44 @@ valid_orfs = [raw_data[start-1:end] for offset in predictions[2] for start, end 
 invalid_orfs = [raw_data[start-1:end] for offset in predictions[0] for start, end in offset]
 P, Q, tableP, tableQ = gene_predictor.train_markov_model(valid_orfs, invalid_orfs)
 
+# flags
 write_length_csv = False
 write_markov_csv = False
-write_markov_roc_csv = True
-write_length_roc_csv = True
+write_markov_roc_csv = False
+write_length_roc_csv = False
+write_markov_vs_orf = True
+
 actual = set([a[1] for a in genes])
+
+if write_markov_vs_orf:
+    short = []
+    long = []
+    pred = gene_predictor.predict_by_length(raw_data)
+    for offset in pred[0]:
+        for range in offset:
+            start = range[0] - 1
+            end = range[1]
+            seq = raw_data[start:end]
+            mm = gene_predictor.markov_score(P, Q, seq)
+            short.append((str(mm), str(len(seq))))
+
+    for offset in pred[2]:
+        for range in offset:
+            start = range[0] - 1
+            end = range[1]
+            seq = raw_data[start:end]
+            mm = gene_predictor.markov_score(P, Q, seq)
+            long.append((str(mm), str(len(seq))))
+
+    f = open('short_orf_markov.csv', 'w')
+    for point in short:
+        f.write(point[0] + ',' + point[1] + '\n')
+    f.close()
+
+    f = open('long_orf_markov.csv', 'w')
+    for point in long:
+        f.write(point[0] + ',' + point[1] + '\n')
+    f.close()
 
 if write_markov_roc_csv:
     res = []
@@ -38,7 +71,7 @@ if write_markov_roc_csv:
 
 if write_length_roc_csv:
     res = []
-    for i in range(50, 1500, 10):
+    for i in range(50, 1410):
         pred = gene_predictor.predict_by_threshold(raw_data, i)
         tru_pos, false_pos, false_neg = gene_predictor.check_predictions(pred[1], actual)
         res.append((str(float(false_pos)/(tru_pos + false_pos)), str(float(tru_pos)/(tru_pos + false_pos))))
@@ -83,9 +116,3 @@ if write_markov_csv:
     for point in res:
         f.write(point[0] + ', ' + point[1] + ', ' + point[2] + ', ' + point[3] + '\n')
     f.close()
-
-
-
-
-# Create csv file of markov prediction
-#f = open('markov.csv', 'w')
