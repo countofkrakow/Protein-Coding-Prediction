@@ -10,37 +10,42 @@ CSE 427
 1.c ORF's longer than 1400 nucleotides: 118
 1.d CDS's found in GenBank: 878
 1.e Markov chain counts
-    P counts:
-    x/y  A             C             G             T
-    A    (6580, 15925) (1780, 4245)  (3965, 8034)  (3336, 9162)
-    C    (1656, 3997)  (685, 1479)   (293, 765)    (773, 3109)
-    G    (3295, 9681)  (999, 2719)   (1981, 4195)  (956, 4043)
-    T    (3395, 8932)  (837, 2550)   (2259, 6184)  (2907, 9109)
 
-    Q counts:
+P counts:
     x/y  A             C             G             T
-    A    (28571, 73290)(8454, 23175) (13459, 31219)(20644, 55273)
-    C    (7929, 20556) (4319, 10327) (1209, 3489)  (5077, 19626)
-    G    (12136, 36322)(4744, 14482) (7204, 16687) (5306, 20666)
-    T    (26783, 62095)(7386, 23719) (11322, 29521)(20399, 63404)
-1.f
-    SUMMARY FOR FIRST 5 ORFS OF LENGTH < 50
+    A    (6580, 15905) (1780, 4243)  (3965, 8028)  (3302, 9122)
+    C    (1656, 3997)  (685, 1479)   (293, 765)    (770, 3104)
+    G    (3295, 9671)  (999, 2718)   (1981, 4195)  (950, 4035)
+    T    (3347, 8877)  (837, 2549)   (2250, 6173)  (2895, 9087)
+Q counts:
+    x/y  A             C             G             T
+    A    (28571, 68981)(8454, 21954) (13459, 30187)(14240, 43497)
+    C    (7929, 19516) (4319, 9956)  (1209, 3385)  (3549, 16238)
+    G    (12136, 33242)(4744, 13069) (7204, 15992) (3650, 16066)
+    T    (12913, 39334)(7386, 22499) (5369, 22570) (12610, 48168)
+
+SUMMARY FOR FIRST 5 ORFS OF LENGTH < 50
     #     Start      Length     MM Score           CDS?
-    1     0          39         0.03156742017      True
-    2     2           6         0.36262054431      True
-    3     8          15         0.81785593757      True
-    4    23          12        -0.47279966662      False
-    5    39          15         0.24829420440      True
-    SUMMARY FOR FIRST 5 ORFS OF LENGTH > 1400
+    1     0          39         1.68306334194      False
+    2     2           6         1.16794069103      False
+    3     8          15         0.77537801825      False
+    4    23          12        -0.09180348043      False
+    5    39          15         0.41047969741      False
+SUMMARY FOR FIRST 5 ORFS OF LENGTH > 1400
     #     Start      Length     MM Score           CDS?
-    1     17618      1614       29.87548854819     True
-    2     33625      1623       56.15971899082     True
-    3     42724      2388       33.74059470884     True
-    4     74591      1422       44.88174174503     True
-    5     76819      1665       73.57136684835     True
+    1     17618      1614       55.38246635418     True
+    2     33625      1623       65.46230761854     True
+    3     42724      2388       76.04450653311     True
+    4     74591      1422       36.66817532102     True
+    5     76819      1665       61.09127976408     True
 
 2.
+    AUC for Markov: 0.445789597
+    AUC for Length: 0.228334767
 
-3. ORF length get's a 80% accuracy rate around chain length 350.  At this point, there are 766 TP's and 189 FP's.
+3. ORF length get's a 80% accuracy rate around chain length 430.  At this point, there are 703 TP's and 79 FP's.
 
-4. Markov chain probabilities get 80% accuracy around log probability of 7.2. At this point there are 507 TP's and 113 FP's.
+4. Markov chain probabilities get 80% accuracy around log probability of 5.8. At this point there are 704 TP's and 98 FP's.
+
+5. At an 80% true positive rate, there were still 74 false positives. This occurred with the threshold being 24% of the way from the median of the negative examples to the positive examples.
+At the professor's desired threshold of 20%, we get a true positive rate of around 86%, but we also get 158 false positives, so maybe the 6% extra tp's isn't worth it.

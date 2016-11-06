@@ -53,6 +53,7 @@ def check_predictions(predictions, actual):
 def train_markov_counts(sequences, chain_len=3):
     counts = {}
     for seq in sequences:
+        seq = seq[:-3]
         for i in range(chain_len, len(seq)):
             markov = re.sub(r'[^AGTC]', 'T', seq[i - chain_len:i].upper())
             unk = re.sub(r'[^AGTC]', 'T', seq[i].upper())
@@ -142,7 +143,7 @@ if __name__ == '__main__':
         length = end - start
         seq = raw_data[start:end]
         mm = markov_score(P, Q, seq)
-        print('{0:d}{1:6d}{2:12d}{3:22.11f}      {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
+        print('{0:d}{1:6d}{2:12d}{3:22.11f}      {4:18}'.format(i+1, start, length, mm, str(end in actual)))
 
     # ORF's higher than 1400
     print('SUMMARY FOR FIRST 5 ORFS OF LENGTH > 1400')
@@ -153,5 +154,5 @@ if __name__ == '__main__':
         length = end - start
         seq = raw_data[start:end]
         mm = markov_score(P, Q, seq)
-        print('{0:d}    {1:6d}{2:10d}{3:21.11f}     {4:18}'.format(i+1, start, length, mm, str(mm > 0)))
+        print('{0:d}    {1:6d}{2:10d}{3:21.11f}     {4:18}'.format(i+1, start, length, mm, str(end in actual)))
 
