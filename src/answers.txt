@@ -2,6 +2,8 @@ Chris Nakovski
 hw2
 CSE 427
 
+note: see graphs folder for the ROC charts and other plots
+
 1.a ORF's per reading frame:
 	0: 37897
 	1: 38771
